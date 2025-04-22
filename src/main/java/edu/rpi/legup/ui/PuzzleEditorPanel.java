@@ -63,6 +63,7 @@ public class PuzzleEditorPanel extends LegupPanel implements IHistoryListener {
     private boolean existingPuzzle;
     private String fileName;
     private File puzzleFile;
+    private JComboBox ruleDropdown;
 
     /**
      * Constructs a {@code PuzzleEditorPanel} with the specified file dialog, frame, and Legup UI
@@ -452,6 +453,11 @@ public class PuzzleEditorPanel extends LegupPanel implements IHistoryListener {
                 });
         getToolBar2Buttons()[2] = saveandsolve;
         toolBar2.add(getToolBar2Buttons()[2]);
+
+        String[] solveRules = {"Rule Type: Default", "Rule Type: One Path"};
+        ruleDropdown = new JComboBox(solveRules);
+
+        toolBar2.add(ruleDropdown);
 
         this.add(toolBar2, BorderLayout.NORTH);
     }

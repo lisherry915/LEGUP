@@ -5,6 +5,8 @@ import edu.rpi.legup.app.GameBoardFacade;
 import edu.rpi.legup.controller.CursorController;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Objects;
@@ -35,12 +37,14 @@ public class CreatePuzzleDialog extends JDialog {
                     String puzzleName = (String) comboBox.getSelectedItem();
                     if (puzzleName.equals("ShortTruthTable")) {
                         textInputScrollPane.setVisible(true);
+                        textOutputScrollPane.setVisible(true);
                         rowsLabel.setVisible(false);
                         rows.setVisible(false);
                         columnsLabel.setVisible(false);
                         columns.setVisible(false);
                     } else {
                         textInputScrollPane.setVisible(false);
+                         textOutputScrollPane.setVisible(false);
                         rowsLabel.setVisible(true);
                         rows.setVisible(true);
                         columnsLabel.setVisible(true);
@@ -57,6 +61,8 @@ public class CreatePuzzleDialog extends JDialog {
 
     private JTextArea textArea;
     private JScrollPane textInputScrollPane;
+    private JScrollPane textOutputScrollPane;
+    private JLabel shortTruthTableOutput;
 
     private JButton ok = new JButton("Ok");
     private ActionListener okButtonListener =
@@ -100,6 +106,50 @@ public class CreatePuzzleDialog extends JDialog {
                 }
             };
 
+    private KeyListener dynamicTextListener =
+            new KeyListener() {
+                @Override
+                public void keyTyped(KeyEvent e){
+                    
+                    //System.out.println("Hi");
+                }
+                @Override 
+                public void keyReleased(KeyEvent e){
+                    //System.out.println("Hi!");
+                    String input = textArea.getText();
+                    String displayed = "";
+                    for(int i = 0; i < input.length(); i ++){
+                        switch(input.charAt(i)){
+                        case '^':
+                            displayed = displayed + "\u2227";
+                            break;
+                        case '|':
+                            displayed = displayed + "\u2228";
+                            break;
+                        case '~':
+                            displayed = displayed + "\u00AC";
+                            break;
+                        case '>':
+                            displayed = displayed + "\u2192";
+                            break;
+                        case '-':
+                            displayed = displayed + "\u2194";
+                            break;
+                        default:
+                            displayed = displayed + input.charAt(i);
+                            break;
+                        }
+                    }
+                    shortTruthTableOutput.setText(displayed);
+
+                }
+                @Override
+                public void keyPressed(KeyEvent e){
+                    //System.out.println("Hi!!");
+
+                }
+            };
+
     private JButton cancel = new JButton("Cancel");
     private ActionListener cancelButtonListener =
             new ActionListener() {
@@ -113,6 +163,7 @@ public class CreatePuzzleDialog extends JDialog {
                     dispose();
                 }
             };
+
 
     /**
      * Constructs a new CreatePuzzleDialog
@@ -129,7 +180,7 @@ public class CreatePuzzleDialog extends JDialog {
 
         Rectangle b = parent.getBounds();
 
-        setSize(350, 200);
+        setSize(350, 300);
         setLocation((int) b.getCenterX() - getWidth() / 2, (int) b.getCenterY() - getHeight() / 2);
 
         Container c = getContentPane();
@@ -139,8 +190,8 @@ public class CreatePuzzleDialog extends JDialog {
         puzzleLabel.setBounds(10, 30, 70, 25);
         gameBox.setBounds(80, 30, 190, 25);
 
-        ok.setBounds(20, 130, 60, 25);
-        cancel.setBounds(170, 130, 90, 25);
+        ok.setBounds(20, 200, 60, 25);
+        cancel.setBounds(170, 200, 90, 25);
 
         c.add(puzzleLabel);
         c.add(gameBox);
@@ -151,8 +202,8 @@ public class CreatePuzzleDialog extends JDialog {
         rowsLabel = new JLabel("Rows:");
         columnsLabel = new JLabel("Columns:");
 
-        rowsLabel.setBounds(30, 70, 60, 25);
-        columnsLabel.setBounds(30, 95, 60, 25);
+        rowsLabel.setBounds(50, 70, 60, 25);
+        columnsLabel.setBounds(50, 95, 60, 25);
 
         rows.setBounds(100, 70, 60, 25);
         columns.setBounds(100, 95, 60, 25);
@@ -164,25 +215,33 @@ public class CreatePuzzleDialog extends JDialog {
         c.add(columns);
 
         textArea = new JTextArea();
+        shortTruthTableOutput = new JLabel();
         textInputScrollPane =
-                new JScrollPane(
-                        textArea,
-                        JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                        JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            new JScrollPane(
+                    textArea,
+                    JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        textOutputScrollPane = new JScrollPane(shortTruthTableOutput, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        textArea.addKeyListener(dynamicTextListener);
         textInputScrollPane.setBounds(10, 70, this.getWidth() - 30, 50);
+        textOutputScrollPane.setBounds(10, 140, this.getWidth() - 30, 50);
         c.add(textInputScrollPane);
-
+        c.add(textOutputScrollPane);
         c.add(ok);
         c.add(cancel);
 
         if (Objects.equals(this.gameBox.getSelectedItem(), "ShortTruthTable")) {
+
             textInputScrollPane.setVisible(true);
+            textOutputScrollPane.setVisible(true);
             rowsLabel.setVisible(false);
             rows.setVisible(false);
             columnsLabel.setVisible(false);
             columns.setVisible(false);
         } else {
             textInputScrollPane.setVisible(false);
+             textOutputScrollPane.setVisible(false);
             rowsLabel.setVisible(true);
             rows.setVisible(true);
             columnsLabel.setVisible(true);
