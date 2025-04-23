@@ -116,30 +116,36 @@ public class CreatePuzzleDialog extends JDialog {
                 @Override 
                 public void keyReleased(KeyEvent e){
                     //System.out.println("Hi!");
-                    String input = textArea.getText();
-                    String displayed = "";
-                    for(int i = 0; i < input.length(); i ++){
-                        switch(input.charAt(i)){
-                        case '^':
-                            displayed = displayed + "\u2227";
-                            break;
-                        case '|':
-                            displayed = displayed + "\u2228";
-                            break;
-                        case '~':
-                            displayed = displayed + "\u00AC";
-                            break;
-                        case '>':
-                            displayed = displayed + "\u2192";
-                            break;
-                        case '-':
-                            displayed = displayed + "\u2194";
-                            break;
-                        default:
-                            displayed = displayed + input.charAt(i);
-                            break;
+                    String[] text = getTextArea();
+                    String displayed = "<html>";
+                    for(int j = 0; j < text.length; j ++){
+                        String input = text[j];
+                        
+                        for(int i = 0; i < input.length(); i ++){
+                            switch(input.charAt(i)){
+                            case '^':
+                                displayed = displayed + "\u2227";
+                                break;
+                            case '|':
+                                displayed = displayed + "\u2228";
+                                break;
+                            case '~':
+                                displayed = displayed + "\u00AC";
+                                break;
+                            case '>':
+                                displayed = displayed + "\u2192";
+                                break;
+                            case '-':
+                                displayed = displayed + "\u2194";
+                                break;
+                            default:
+                                displayed = displayed + input.charAt(i);
+                                break;
+                            }
                         }
+                        displayed = displayed + "<br>";
                     }
+                    displayed = displayed + "</html>";
                     shortTruthTableOutput.setText(displayed);
 
                 }
