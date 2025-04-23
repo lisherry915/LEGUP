@@ -60,6 +60,8 @@ public abstract class Puzzle implements IBoardSubject, ITreeSubject {
     protected List<CaseRule> caseRules;
     protected List<PlaceableElement> placeableElements;
 
+    protected int goalType = 2;
+
     /** Puzzle Constructor - creates a new Puzzle */
     public Puzzle() {
         this.boardListeners = new ArrayList<>();
@@ -71,8 +73,15 @@ public abstract class Puzzle implements IBoardSubject, ITreeSubject {
 
         this.placeableElements = new ArrayList<>();
 
+        goalType = 2;
+
         registerRules();
         registerPuzzleElements();
+    }
+
+    public void setGoalType(int g){
+        goalType = g;
+        System.out.println(goalType);
     }
 
     /**
@@ -219,24 +228,64 @@ public abstract class Puzzle implements IBoardSubject, ITreeSubject {
         if (tree == null) {
             return false;
         }
-
-        boolean isComplete = tree.isValid();
-        if (isComplete) {
-            for (TreeElement leaf : tree.getLeafTreeElements()) {
-                if (leaf.getType() == TreeElementType.NODE) {
-                    TreeNode node = (TreeNode) leaf;
-                    if (!node.isRoot()) {
-                        isComplete &=
-                                node.getParent().isContradictoryBranch()
-                                        || isBoardComplete(node.getBoard());
+        boolean isComplete = false;
+        if(goalType == 0){
+            isComplete = tree.isValid();
+            System.out.println("I am in branch 0");
+            if (isComplete) {
+                for (TreeElement leaf : tree.getLeafTreeElements()) {
+                    if (leaf.getType() == TreeElementType.NODE) {
+                        TreeNode node = (TreeNode) leaf;
+                        if (!node.isRoot()) {
+                            isComplete &=
+                                    node.getParent().isContradictoryBranch()
+                                            || isBoardComplete(node.getBoard());
+                        } else {
+                            isComplete &= isBoardComplete(node.getBoard());
+                        }
                     } else {
-                        isComplete &= isBoardComplete(node.getBoard());
+                        isComplete = false;
                     }
-                } else {
-                    isComplete = false;
                 }
             }
         }
+        else if(goalType == 1){
+            System.out.println("I am in branch 1");
+            isComplete = tree.isValid();
+            
+            if (isComplete) {
+                isComplete = false;
+                for (TreeElement leaf : tree.getLeafTreeElements()) {
+                    if (leaf.getType() == TreeElementType.NODE) {
+                        TreeNode node = (TreeNode) leaf;
+                        if(isBoardComplete(node.getBoard())){
+                            return true;
+                        }
+                    } else {
+                        isComplete = false;
+                    }
+                }
+            }
+        }
+    
+        else if(goalType == 2){
+            isComplete = tree.isValid();
+            System.out.println("I am in branch 2");
+            if (isComplete) {
+                for (TreeElement leaf : tree.getLeafTreeElements()) {
+                    if (leaf.getType() == TreeElementType.NODE) {
+                        TreeNode node = (TreeNode) leaf;
+                        if (!node.isRoot()) {
+                            isComplete &=
+                                    node.getParent().isContradictoryBranch();
+                        }
+                    } else {
+                        isComplete = false;
+                    }
+                }
+            }
+        }
+        
         return isComplete;
     }
 
@@ -293,7 +342,7 @@ public abstract class Puzzle implements IBoardSubject, ITreeSubject {
             if (importer == null) {
                 throw new InvalidFileFormatException("Puzzle importer null");
             }
-            importer.initializePuzzle(node);
+            importer.initializePuzzle(node, goalType);
         } else {
             LOGGER.error("Invalid file");
             throw new InvalidFileFormatException("Invalid file: must be a Legup file");

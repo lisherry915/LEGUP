@@ -67,6 +67,7 @@ public class ProofEditorPanel extends LegupPanel implements IHistoryListener {
     private JMenuItem undo, redo, fitBoardToScreen, fitTreeToScreen;
 
     private JMenu view;
+    private JLabel goalLabel;
 
     private JMenu proof;
     private JMenuItem add, delete, merge, collapse;
@@ -962,6 +963,10 @@ public class ProofEditorPanel extends LegupPanel implements IHistoryListener {
 
         getToolBar2Buttons()[3] = check;
         toolBar2.add(getToolBar2Buttons()[3]);
+        String[] goals = {"Full Tree", "Satisfiability (One Path)", "Unsatisfiability (No paths)"};
+        goalLabel = new JLabel("         GOAL TYPE: " + goals[GameBoardFacade.getInstance().getGoalType()]);
+        System.out.println(GameBoardFacade.getInstance().getGoalType());
+        toolBar2.add(goalLabel);
 
         this.add(toolBar2, BorderLayout.NORTH);
     }

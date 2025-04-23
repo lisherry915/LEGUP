@@ -65,6 +65,20 @@ public class PuzzleEditorPanel extends LegupPanel implements IHistoryListener {
     private File puzzleFile;
     private JComboBox ruleDropdown;
 
+    private int getGoalType(){
+        if(ruleDropdown == null){
+            return 0;
+        }
+        String s = (String) ruleDropdown.getSelectedItem();
+        if(s.equals("Goal Type: Full Tree")){
+            return 0;
+        }
+        if(s.equals("Goal Type: One Path")){
+            return 1;
+        }
+        return 2;
+    }
+
     /**
      * Constructs a {@code PuzzleEditorPanel} with the specified file dialog, frame, and Legup UI
      * instance
@@ -439,12 +453,13 @@ public class PuzzleEditorPanel extends LegupPanel implements IHistoryListener {
                             String filename = savePuzzle();
                             File puzzlename = new File(filename);
                             System.out.println(filename);
-
+                            GameBoardFacade.getInstance().setGoalType(getGoalType());
                             GameBoardFacade.getInstance().getLegupUI().displayPanel(1);
                             GameBoardFacade.getInstance()
                                     .getLegupUI()
                                     .getProofEditor()
                                     .loadPuzzle(filename, new File(filename));
+
                             String puzzleName =
                                     GameBoardFacade.getInstance().getPuzzleModule().getName();
                             frame.setTitle(puzzleName + " - " + puzzlename.getName());
@@ -454,7 +469,7 @@ public class PuzzleEditorPanel extends LegupPanel implements IHistoryListener {
         getToolBar2Buttons()[2] = saveandsolve;
         toolBar2.add(getToolBar2Buttons()[2]);
 
-        String[] solveRules = {"Rule Type: Default", "Rule Type: One Path"};
+        String[] solveRules = {"Goal Type: Full Tree", "Goal Type: One Path", "Goal Type: No valid paths"};
         ruleDropdown = new JComboBox(solveRules);
 
         toolBar2.add(ruleDropdown);

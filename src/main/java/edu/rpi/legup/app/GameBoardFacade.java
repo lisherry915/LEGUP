@@ -55,6 +55,7 @@ public class GameBoardFacade implements IHistorySubject {
 
     private History history;
     private List<IHistoryListener> historyListeners;
+    private int goalType = 0;
 
     /** Private GameBoardFacade Constructor creates a game board facade */
     protected GameBoardFacade() {
@@ -221,7 +222,7 @@ public class GameBoardFacade implements IHistorySubject {
                 }
 
                 setWindowTitle(puzzle.getName(), "New " + puzzle.getName() + " Puzzle");
-                importer.initializePuzzle(rows, columns);
+                importer.initializePuzzle(rows, columns, goalType);
 
                 puzzle.initializeView();
                 //
@@ -269,7 +270,59 @@ public class GameBoardFacade implements IHistorySubject {
             }
 
             setWindowTitle(puzzle.getName(), "New " + puzzle.getName() + " Puzzle");
-            importer.initializePuzzle(statements);
+            System.out.println("Hiii");
+
+            importer.initializePuzzle(statements, goalType);
+
+            puzzle.initializeView();
+            //
+            // puzzle.getBoardView().onTreeElementChanged(puzzle.getTree().getRootNode());
+            setPuzzleEditor(puzzle);
+        } catch (IllegalArgumentException exception) {
+            throw new IllegalArgumentException(exception.getMessage());
+        } catch (ClassNotFoundException
+                | NoSuchMethodException
+                | InvocationTargetException
+                | IllegalAccessException
+                | InstantiationException e) {
+            LOGGER.error(e);
+            throw new RuntimeException("Puzzle creation error");
+        }
+    }
+
+    /**
+     * Loads an empty puzzle with the specified input
+     *
+     * @param game name of the puzzle
+     * @param statements an array of statements to load the puzzle with
+     */
+    public void loadPuzzle(String game, String[] statements, int g) {
+        String qualifiedClassName = config.getPuzzleClassForName(game);
+        LOGGER.debug("Loading " + qualifiedClassName);
+
+        try {
+            goalType = g;
+            System.out.println("aaa");
+            System.out.println(g);
+            Class<?> c = Class.forName(qualifiedClassName);
+            Constructor<?> cons = c.getConstructor();
+            Puzzle puzzle = (Puzzle) cons.newInstance();
+
+            PuzzleImporter importer = puzzle.getImporter();
+            if (importer == null) {
+                LOGGER.error("Puzzle importer is null");
+                throw new RuntimeException("Puzzle importer null");
+            }
+
+            // Theoretically, this exception should never be thrown, since LEGUP should not be
+            // allowing the user to give text input for a puzzle that doesn't support it
+            if (!importer.acceptsTextInput()) {
+                throw new IllegalArgumentException(
+                        puzzle.getName() + " does not accept text input");
+            }
+
+            setWindowTitle(puzzle.getName(), "New " + puzzle.getName() + " Puzzle");
+            importer.initializePuzzle(statements, goalType);
 
             puzzle.initializeView();
             //
@@ -378,7 +431,7 @@ public class GameBoardFacade implements IHistorySubject {
                     LOGGER.error("Puzzle importer is null");
                     throw new InvalidFileFormatException("Puzzle importer null");
                 }
-                importer.initializePuzzle(node);
+                importer.initializePuzzle(node, goalType);
                 puzzle.initializeView();
                 puzzle.getBoardView().onTreeElementChanged(puzzle.getTree().getRootNode());
                 setPuzzleEditor(puzzle);
@@ -435,7 +488,7 @@ public class GameBoardFacade implements IHistorySubject {
                     LOGGER.error("Puzzle importer is null");
                     throw new InvalidFileFormatException("Puzzle importer null");
                 }
-                importer.initializePuzzle(node);
+                importer.initializePuzzle(node, goalType);
                 puzzle.initializeView();
                 puzzle.getBoardView().onTreeElementChanged(puzzle.getTree().getRootNode());
                 setPuzzle(puzzle);
@@ -568,5 +621,14 @@ public class GameBoardFacade implements IHistorySubject {
      */
     public History getHistory() {
         return history;
+    }
+
+    public int getGoalType(){
+        return goalType;
+    }
+
+    public void setGoalType(int g){
+        System.out.println(g);
+        goalType = g;
     }
 }

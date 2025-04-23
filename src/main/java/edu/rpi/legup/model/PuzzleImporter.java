@@ -44,8 +44,11 @@ public abstract class PuzzleImporter {
      * @param columns number of columns on the puzzle
      * @throws RuntimeException if puzzle can not be made
      */
-    public void initializePuzzle(int rows, int columns) throws RuntimeException {
+    public void initializePuzzle(int rows, int columns, int goalType) throws RuntimeException {
+
         if (this.puzzle.isValidDimensions(rows, columns)) {
+
+            this.puzzle.setGoalType(goalType);
             initializeBoard(rows, columns);
         } else {
             throw new IllegalArgumentException("Invalid dimensions provided");
@@ -60,11 +63,13 @@ public abstract class PuzzleImporter {
      * @throws IllegalArgumentException if the statements are not suitable for initializing the
      *     puzzle
      */
-    public void initializePuzzle(String[] statements)
+    public void initializePuzzle(String[] statements, int goalType)
             throws InputMismatchException, IllegalArgumentException {
         // Note: Error checking for the statements will be left up to the puzzles that support
         // text input. For example, some puzzles may be okay with "blank" statements (Strings with
         // length = 0) while others may not.
+        System.out.println("hi");
+        this.puzzle.setGoalType(goalType);
         initializeBoard(statements);
     }
 
@@ -74,7 +79,7 @@ public abstract class PuzzleImporter {
      * @param node the XML document node representing the puzzle
      * @throws InvalidFileFormatException if the file format is invalid
      */
-    public void initializePuzzle(Node node) throws InvalidFileFormatException {
+    public void initializePuzzle(Node node, int goalType) throws InvalidFileFormatException {
         if (node.getNodeName().equalsIgnoreCase("puzzle")) {
             org.w3c.dom.Element puzzleElement = (org.w3c.dom.Element) node;
 
@@ -126,6 +131,7 @@ public abstract class PuzzleImporter {
             throw new InvalidFileFormatException(
                     "Invalid file format; does not contain \"puzzle\" node");
         }
+        this.puzzle.setGoalType(goalType);
     }
 
     /**
